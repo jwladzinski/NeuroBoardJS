@@ -19,7 +19,7 @@ function random(n, m) {
     return c;
 }
 
-Array.prototype.dot = function(b){
+Array.prototype.dot = function(b) {
     var a = this;
     var c = zeros(a.length, b[0].length);
     for (var i = 0; i < a.length; i++) {
@@ -32,7 +32,7 @@ Array.prototype.dot = function(b){
     return c;
 };
 
-Array.prototype.T = function(){
+Array.prototype.T = function() {
     var a = this;
     var c = zeros(a[0].length, a.length);
     for (var i = 0; i < a.length; ++i) {
@@ -43,23 +43,39 @@ Array.prototype.T = function(){
     return c;
 };
 
-Array.prototype.multiply = function(b){
+Number.prototype.add = function(b) {
     var a = this;
     var c = zeros(a.length, a[0].length);
     for (var i = 0; i < a.length; i++) {
         for (var j = 0; j < a[i].length; j++) {
-            c[i][j] = a[i][j] * b;
+            c[i][j] = a + b[i][j];
         }
     }
     return c;
 };
 
-Array.prototype.divide = function(b){
+Number.prototype.subtract = function(b) {
+    var a = this;
+    return a.add(-b);
+};
+
+Number.prototype.multiply = function(b) {
+    var a = this;
+    var c = zeros(a.length, a[0].length);
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < a[i].length; j++) {
+            c[i][j] = a * b[i][j];
+        }
+    }
+    return c;
+};
+
+Number.prototype.divide = function(b) {
     var a = this;
     return a.multiply(1/b);
 };
 
-Array.prototype.add = function(b){
+Array.prototype.add = function(b) {
     var a = this;
     var c = zeros(a.length, a[0].length);
     for (var i = 0; i < a.length; i++) {
@@ -70,10 +86,53 @@ Array.prototype.add = function(b){
     return c;
 };
 
-Array.prototype.subtract = function(b){
+Array.prototype.subtract = function(b) {
     var a = this;
     return a.add(-b);
 };
+
+Array.prototype.multiply = function(b) {
+    var a = this;
+    var c = zeros(a.length, a[0].length);
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < a[i].length; j++) {
+            c[i][j] = a[i][j] * b;
+        }
+    }
+    return c;
+};
+
+Array.prototype.divide = function(b) {
+    var a = this;
+    return a.multiply(1/b);
+};
+
+
+Array.prototype.exp = function() {
+    var a = this;
+    var c = zeros(a.length, a[0].length);
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < a[i].length; j++) {
+            c[i][j] = Math.exp(a[i][j]);
+        }
+    }
+    return c;
+};
+
+Array.prototype.sigmoid = function(x, deriv) {
+    if (deriv) {
+        return x.multiply((1).subtract(x));
+    } else {
+        return x.multiply(-x.add(1));
+    }
+};
+
+function sigmoid(x, deriv) {
+    if (deriv) {
+        return x * (1 - x);
+    }
+    return (1).divide((1).add(-x.exp()));
+}
 
 function display(m) {
     for (var i = 0; i < m.length; ++i) {
@@ -82,8 +141,8 @@ function display(m) {
 }
 
 var X = [[0,0,1], [0,1,1], [1,0,1], [1,1,1]];
+var y = [[0,1,1,0]].T;
 
-display(X.multiply(3));
-display(X.divide(4));
-display(X.add(5));
-display(X.subtract(6));
+syn0 = random(3, 4).multiply(2).subtract(1);
+
+display(syn0);
