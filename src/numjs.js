@@ -33,7 +33,8 @@ Array.prototype.dot = function(b){
     return c;
 };
 
-function transpose(a) {
+Array.prototype.T = function(){
+    var a = this;
     var c = zeros(a[0].length, a.length);
     for (var i = 0; i < a.length; ++i) {
         for (var j = 0; j < a[i].length; ++j) {
@@ -41,7 +42,8 @@ function transpose(a) {
         }
     }
     return c;
-}
+};
+
 
 function multiply(a, b) {
     for (var i = 0; i < a.length; i++) {
@@ -84,7 +86,7 @@ display(a.dot(b));
 
 
 X = [[0,0,1], [0,1,1], [1,0,1], [1,1,1]];
-y = transpose([[0,1,1,0]]);
+y = [[0,1,1,0]].T;
 
 display(X);
 display(y);
