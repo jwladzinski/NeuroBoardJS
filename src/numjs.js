@@ -44,15 +44,17 @@ Array.prototype.T = function(){
     return c;
 };
 
-
-function multiply(a, b) {
+Array.prototype.multiply = function(){
+    var a = this;
+    var c = zeros(a.length, a[0].length);
     for (var i = 0; i < a.length; i++) {
         for (var j = 0; j < a[i].length; j++) {
-            a[i][j] *= b;
+            c[i][j] *= b;
         }
     }
-    return a;
-}
+    return c;
+};
+
 
 function divide(a, b) {
     return multiply(a, 1/b);
@@ -90,11 +92,11 @@ y = [[0,1,1,0]].T;
 
 display(X);
 display(y);
-display(multiply(X, 2));
+display(X.multiply(2));
 display(zeros(4, 4));
 
-syn0 = minus(multiply(random(3, 4), 2), 1);
-syn1 = minus(multiply(random(4, 1), 2), 1);
+//syn0 = minus(multiply(random(3, 4), 2), 1);
+//syn1 = minus(multiply(random(4, 1), 2), 1);
 
 display(syn0);
 display(syn1);
