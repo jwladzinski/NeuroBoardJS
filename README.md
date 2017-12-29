@@ -1,2 +1,1 @@
-# NeuroBoardJS
-Neural Network library with visualisation feature
+`owl.js` is a Neural Networks library written in JavaScript.
