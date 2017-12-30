@@ -45,9 +45,9 @@ Array.prototype.T = function() {
 
 Number.prototype.add = function(b) {
     var a = this;
-    var c = zeros(a.length, a[0].length);
-    for (var i = 0; i < a.length; i++) {
-        for (var j = 0; j < a[i].length; j++) {
+    var c = zeros(b.length, b[0].length);
+    for (var i = 0; i < b.length; i++) {
+        for (var j = 0; j < b[i].length; j++) {
             c[i][j] = a + b[i][j];
         }
     }
@@ -56,14 +56,20 @@ Number.prototype.add = function(b) {
 
 Number.prototype.subtract = function(b) {
     var a = this;
-    return a.add(-b);
+    var c = zeros(b.length, b[0].length);
+    for (var i = 0; i < b.length; i++) {
+        for (var j = 0; j < b[i].length; j++) {
+            c[i][j] = a - b[i][j];
+        }
+    }
+    return c;
 };
 
 Number.prototype.multiply = function(b) {
     var a = this;
-    var c = zeros(a.length, a[0].length);
-    for (var i = 0; i < a.length; i++) {
-        for (var j = 0; j < a[i].length; j++) {
+    var c = zeros(b.length, b[0].length);
+    for (var i = 0; i < b.length; i++) {
+        for (var j = 0; j < b[i].length; j++) {
             c[i][j] = a * b[i][j];
         }
     }
@@ -72,39 +78,97 @@ Number.prototype.multiply = function(b) {
 
 Number.prototype.divide = function(b) {
     var a = this;
-    return a.multiply(1/b);
+    var c = zeros(b.length, b[0].length);
+    for (var i = 0; i < b.length; i++) {
+        for (var j = 0; j < b[i].length; j++) {
+            c[i][j] = a / b[i][j];
+        }
+    }
+    return c;
 };
 
 Array.prototype.add = function(b) {
+    var i, j;
     var a = this;
     var c = zeros(a.length, a[0].length);
-    for (var i = 0; i < a.length; i++) {
-        for (var j = 0; j < a[i].length; j++) {
-            c[i][j] = a[i][j] + b;
+
+    if ((typeof b) === "number") {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] + b;
+            }
+        }
+    } else {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] + b[i][j];
+            }
         }
     }
     return c;
 };
 
 Array.prototype.subtract = function(b) {
+    var i, j;
     var a = this;
-    return a.add(-b);
+    var c = zeros(a.length, a[0].length);
+
+    if ((typeof b) === "number") {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] - b;
+            }
+        }
+    } else {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] - b[i][j];
+            }
+        }
+    }
+    return c;
 };
 
 Array.prototype.multiply = function(b) {
+    var i, j;
     var a = this;
     var c = zeros(a.length, a[0].length);
-    for (var i = 0; i < a.length; i++) {
-        for (var j = 0; j < a[i].length; j++) {
-            c[i][j] = a[i][j] * b;
+
+    if (typeof b === "number") {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] * b;
+            }
+        }
+    } else {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] * b[i][j];
+            }
         }
     }
     return c;
 };
 
 Array.prototype.divide = function(b) {
+    var i, j;
     var a = this;
-    return a.multiply(1/b);
+    var c = zeros(a.length, a[0].length);
+
+    if (typeof b === "number") {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] / b;
+            }
+        }
+    } else {
+        for (i = 0; i < a.length; i++) {
+            for (j = 0; j < a[i].length; j++) {
+                c[i][j] = a[i][j] / b[i][j];
+            }
+        }
+    }
+    return c;
 };
 
 
@@ -119,30 +183,47 @@ Array.prototype.exp = function() {
     return c;
 };
 
-Array.prototype.sigmoid = function(x, deriv) {
-    if (deriv) {
-        return x.multiply((1).subtract(x));
-    } else {
-        return x.multiply(-x.add(1));
+Array.prototype.minus = function() {
+    var a = this;
+    var c = zeros(a.length, a[0].length);
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < a[i].length; j++) {
+            c[i][j] = -a[i][j];
+        }
     }
+    return c;
 };
 
-function sigmoid(x, deriv) {
-    if (deriv) {
-        return x * (1 - x);
-    }
-    return (1).divide((1).add(-x.exp()));
+
+function sigmoid(x) {
+    return 1..divide(1..add(x.minus().exp()));
+}
+
+function sigmoid_deriv(x) {
+    return x.dot(1..subtract(x));
 }
 
 function display(m) {
     for (var i = 0; i < m.length; ++i) {
         console.log(m[i].join(' '));
     }
+    console.log();
 }
 
 var X = [[0,0,1], [0,1,1], [1,0,1], [1,1,1]];
-var y = [[0,1,1,0]].T;
+var y = [[0,0,1,1]].T();
 
-syn0 = random(3, 4).multiply(2).subtract(1);
+w = [random(3, 1).multiply(2).subtract(1)];
+layer = new Array(2);
+error = new Array(2);
+delta = new Array(2);
 
-display(syn0);
+for (var i = 0; i < 10000; i++) {
+    layer[0] = X;
+    layer[1] = sigmoid(layer[0].dot(w[0]));
+    error[1] = y.subtract(layer[1]);
+    delta[1] = error[1].multiply(sigmoid_deriv(layer[1]));
+    w[0] = w[0].add(layer[0].T().dot(delta[1]));
+}
+
+display(layer[1]);
