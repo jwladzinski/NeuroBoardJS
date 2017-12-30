@@ -209,7 +209,7 @@ class Net {
         this.layers = [];
     }
 
-    addLayer(layer) {
+    add(layer) {
         this.layers.push(layer);
     }
 
@@ -228,7 +228,7 @@ class Net {
 
         display(this.layers[this.layers.length - 1].output);
     }
-    
+
     static sigmoid(x) {
         return 1..divide(1..add(x.minus().exp()));
     }
@@ -279,5 +279,5 @@ const X = [[0,0,1], [0,1,1], [1,0,1], [1,1,1]];
 const y = [[0,0,1,1]].T();
 
 let net = new Net();
-net.addLayer(new Layer());
-net.train(X, y, 1000);
+net.add(new Layer());
+net.train(X, y, epochs = 1000);
