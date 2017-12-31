@@ -199,6 +199,28 @@ Array.prototype.minus = function() {
     return c;
 };
 
+Array.prototype.relu = function() {
+    let a = this;
+    let c = zeros(a.length, a[0].length);
+    for (let i = 0; i < a.length; i++) {
+        for (let j = 0; j < a[i].length; j++) {
+            c[i][j] = Math.max(a[i][j], 0);
+        }
+    }
+    return c;
+};
+
+Array.prototype.relu_deriv = function() {
+    let a = this;
+    let c = zeros(a.length, a[0].length);
+    for (let i = 0; i < a.length; i++) {
+        for (let j = 0; j < a[i].length; j++) {
+            c[i][j] = a[i][j] > 0 ? 1 : 0;
+        }
+    }
+    return c;
+};
+
 function display(s, m) {
     console.log(s);
     console.log(JSON.stringify(m, null, 1));
@@ -246,6 +268,16 @@ class Net {
         return x.multiply(1..subtract(x));
     }
 
+    static relu(x) {
+        console.log(x);
+        console.log(x.relu());
+        return x.relu()
+    }
+
+    static relu_deriv(x) {
+        return x.relu_deriv();
+    }
+
     activate() {
         for (let j = 0; j < this.layers.length; j++) {
             this.layers[j].output = Net.sigmoid(this.layers[j - 1].output.dot(this.w[j]))
@@ -284,6 +316,5 @@ const y = [[0, 1, 1, 0]].T();
 
 let net = new Net();
 net.add(new Layer(6));
-net.add(new Layer(12));
 net.add(new Layer());
-net.train(X, y, epochs = 10000);
+net.train(X, y, epochs = 2);
