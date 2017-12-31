@@ -260,27 +260,11 @@ class Net {
         console.log(this.layers[this.layers.length - 1].output)
     }
 
-    static sigmoid(x) {
-        return 1..divide(1..add(x.minus().exp()));
-    }
 
-    static sigmoid_deriv(x) {
-        return x.multiply(1..subtract(x));
-    }
-
-    static relu(x) {
-        console.log(x);
-        console.log(x.relu());
-        return x.relu()
-    }
-
-    static relu_deriv(x) {
-        return x.relu_deriv();
-    }
 
     activate() {
         for (let j = 0; j < this.layers.length; j++) {
-            this.layers[j].output = Net.sigmoid(this.layers[j - 1].output.dot(this.w[j]))
+            this.layers[j].output = this.layers[j].activation_fn(this.layers[j - 1].output.dot(this.w[j]));
         }
     }
 
@@ -295,7 +279,7 @@ class Net {
                 error = prevDelta.dot(this.w[j + 1].T());
             }
 
-            let deriv = Net.sigmoid_deriv(this.layers[j].output);
+            let deriv = this.layers[j].activation_deriv(this.layers[j].output)
             let delta = error.multiply(deriv);
             let dw = this.layers[j - 1].output.T().dot(delta);
             this.w[j] = this.w[j].add(dw);
@@ -305,9 +289,31 @@ class Net {
 }
 
 class Layer {
-    constructor(m = 0) {
+    constructor(m = 0, activation_function_name = 'sigmoid') {
         this.m = m;
         this.output = [];
+        if (activation_function_name === 'sigmoid') {
+            this.activation_fn = Layer.sigmoid;
+            this.activation_deriv = Layer.sigmoid_deriv;
+        } else if (activation_function_name === 'relu') {
+            this.activation_fn = Layer.relu;
+            this.activation_deriv = Layer.relu_deriv;
+        }
+    }
+    static sigmoid(x) {
+        return 1..divide(1..add(x.minus().exp()));
+    }
+
+    static sigmoid_deriv(x) {
+        return x.multiply(1..subtract(x));
+    }
+
+    static relu(x) {
+        return x.relu()
+    }
+
+    static relu_deriv(x) {
+        return x.relu_deriv();
     }
 }
 
@@ -315,6 +321,6 @@ const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
 const y = [[0, 1, 1, 0]].T();
 
 let net = new Net();
-net.add(new Layer(6));
-net.add(new Layer());
-net.train(X, y, epochs = 2);
+net.add(new Layer(6, 'sigmoid'));
+net.add(new Layer(0, 'sigmoid'));
+net.train(X, y, epochs = 10000);
