@@ -19,6 +19,10 @@ function random(n, m) {
     return c;
 }
 
+Array.prototype.size = function () {
+    return [this.length, this[0].length];
+};
+
 Array.prototype.dot = function(b) {
     let a = this;
     let c = zeros(a.length, b[0].length);
@@ -29,6 +33,7 @@ Array.prototype.dot = function(b) {
             }
         }
     }
+
     return c;
 };
 
@@ -194,14 +199,10 @@ Array.prototype.minus = function() {
     return c;
 };
 
-
-
-
-function display(m) {
-    for (let i = 0; i < m.length; ++i) {
-        console.log(m[i].join(' '));
-    }
-    console.log();
+function display(s, m) {
+    console.log(s);
+    console.log(JSON.stringify(m, null, 1));
+    console.log('');
 }
 
 class Net {
@@ -213,20 +214,29 @@ class Net {
         this.layers.push(layer);
     }
 
+    static randomWeights(n, m) {
+        return random(n, m).multiply(2).subtract(1);
+    }
+
     train(X, y, epochs) {
 
+        this.layers[-1] = new Layer(X.length, X[0].length);
+        this.layers[-1].output = X;
         this.w = [];
+
         for (let j = 0; j < this.layers.length; j++) {
-            this.w.push(random(3, 1).multiply(2).subtract(1))
+
+            let n = this.layers[j - 1].m;
+            let m = j === this.layers.length - 1 ? y[0].length : this.layers[j].m;
+            this.w.push(Net.randomWeights(n, m))
         }
 
         for (let i = 0; i < epochs; i++) {
-
             this.activate();
             this.backprop();
         }
 
-        display(this.layers[this.layers.length - 1].output);
+        console.log(this.layers[this.layers.length - 1].output)
     }
 
     static sigmoid(x) {
@@ -234,50 +244,48 @@ class Net {
     }
 
     static sigmoid_deriv(x) {
-        return x.dot(1..subtract(x));
+        return x.multiply(1..subtract(x));
     }
 
     activate() {
         for (let j = 0; j < this.layers.length; j++) {
-
-            if (j === 0) {
-                this.layers[j].output = Net.sigmoid(X.dot(this.w[j]))
-            } else {
-                this.layers[j].output = Net.sigmoid(this.layers[j - 1].output.dot(this.w[j]))
-            }
+            this.layers[j].output = Net.sigmoid(this.layers[j - 1].output.dot(this.w[j]))
         }
     }
 
     backprop() {
+
         let prevDelta = [];
         for (let j = this.layers.length - 1; j >= 0; j--) {
-
             let error;
             if (j === this.layers.length - 1) {
                 error = y.subtract(this.layers[j].output);
             } else {
-                error = prevDelta.dot(this.w[j].T());
+                error = prevDelta.dot(this.w[j + 1].T());
             }
-            let delta = error.multiply(Net.sigmoid_deriv(this.layers[j].output));
-            if (j === 0) {
-                this.w[j] = this.w[j].add(X.T().dot(delta));
-            } else {
-                this.w[j] = this.w[j].add(this.layers[j - 1].output.T().dot(delta));
-            }
+
+            let deriv = Net.sigmoid_deriv(this.layers[j].output);
+            let delta = error.multiply(deriv);
+            let dw = this.layers[j - 1].output.T().dot(delta);
+            this.w[j] = this.w[j].add(dw);
             prevDelta = delta;
         }
     }
 }
 
 class Layer {
-    constructor() {
+    constructor(n = 0, m = 0) {
+        this.n = n;
+        this.m = m;
         this.output = [];
     }
 }
 
-const X = [[0,0,1], [0,1,1], [1,0,1], [1,1,1]];
-const y = [[0,0,1,1]].T();
+const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
+const y = [[0, 1, 1, 0]].T();
 
 let net = new Net();
-net.add(new Layer());
-net.train(X, y, epochs = 1000);
+net.add(new Layer(0, 6));
+net.add(new Layer(6, 12));
+net.add(new Layer(12, 0));
+net.train(X, y, epochs = 10000);
