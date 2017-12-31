@@ -220,7 +220,7 @@ class Net {
 
     train(X, y, epochs) {
 
-        this.layers[-1] = new Layer(X.length, X[0].length);
+        this.layers[-1] = new Layer(X[0].length);
         this.layers[-1].output = X;
         this.w = [];
 
@@ -235,7 +235,6 @@ class Net {
             this.activate();
             this.backprop();
         }
-
         console.log(this.layers[this.layers.length - 1].output)
     }
 
@@ -274,8 +273,7 @@ class Net {
 }
 
 class Layer {
-    constructor(n = 0, m = 0) {
-        this.n = n;
+    constructor(m = 0) {
         this.m = m;
         this.output = [];
     }
@@ -285,7 +283,7 @@ const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
 const y = [[0, 1, 1, 0]].T();
 
 let net = new Net();
-net.add(new Layer(0, 6));
-net.add(new Layer(6, 12));
-net.add(new Layer(12, 0));
+net.add(new Layer(6));
+net.add(new Layer(12));
+net.add(new Layer());
 net.train(X, y, epochs = 10000);
