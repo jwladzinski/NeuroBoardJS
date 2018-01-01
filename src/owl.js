@@ -228,8 +228,9 @@ function display(s, m) {
 }
 
 class Net {
-    constructor() {
+    constructor(alpha) {
         this.layers = [];
+        this.alpha = alpha;
     }
 
     add(layer) {
@@ -242,15 +243,17 @@ class Net {
 
     train(X, y, epochs) {
 
-        this.layers[-1] = new Layer(X[0].length);
+        this.layers[-1] = new Layer(X[0].length, 'sigmoid');
         this.layers[-1].output = X;
         this.w = [];
+        this.b = [];
 
         for (let j = 0; j < this.layers.length; j++) {
 
             let n = this.layers[j - 1].m;
             let m = j === this.layers.length - 1 ? y[0].length : this.layers[j].m;
             this.w.push(Net.randomWeights(n, m))
+
         }
 
         for (let i = 0; i < epochs; i++) {
@@ -259,8 +262,6 @@ class Net {
         }
         console.log(this.layers[this.layers.length - 1].output)
     }
-
-
 
     activate() {
         for (let j = 0; j < this.layers.length; j++) {
@@ -279,9 +280,9 @@ class Net {
                 error = prevDelta.dot(this.w[j + 1].T());
             }
 
-            let deriv = this.layers[j].activation_deriv(this.layers[j].output)
+            let deriv = this.layers[j].activation_deriv(this.layers[j].output);
             let delta = error.multiply(deriv);
-            let dw = this.layers[j - 1].output.T().dot(delta);
+            let dw = alpha * this.layers[j - 1].output.T().dot(delta);
             this.w[j] = this.w[j].add(dw);
             prevDelta = delta;
         }
@@ -320,7 +321,7 @@ class Layer {
 const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
 const y = [[0, 1, 1, 0]].T();
 
-let net = new Net();
-net.add(new Layer(6, 'sigmoid'));
-net.add(new Layer(0, 'sigmoid'));
+let net = new Net(alpha=0.5);
+net.add(new Layer(6));
+net.add(new Layer());
 net.train(X, y, epochs = 10000);
