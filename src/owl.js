@@ -282,7 +282,7 @@ class Net {
 
             let deriv = this.layers[j].activation_deriv(this.layers[j].output);
             let delta = error.multiply(deriv);
-            let dw = alpha * this.layers[j - 1].output.T().dot(delta);
+            let dw = alpha.multiply(this.layers[j - 1].output.T().dot(delta));
             this.w[j] = this.w[j].add(dw);
             prevDelta = delta;
         }
