@@ -297,14 +297,14 @@ class Net {
         for (let j = 0; j < this.layers.length; j++) {
 
             let A = this.layers[j - 1].output;
-
-
             let res = A.dot(this.w[j]);
-
-
             this.layers[j].output = this.layers[j].activation_fn(res);
 
-            this.layers[j].output
+            let bin = Net.binomialMatrix(this.layers[j].output.length,
+                this.layers[j].output[0].length, 1, 1 - this.dropout);
+
+            bin = bin.multiply((1.0/(1.0-this.dropout)));
+            this.layers[j].output = this.layers[j].output.multiply(bin);
         }
     }
 
@@ -360,7 +360,7 @@ class Layer {
 const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
 const y = [[0, 1, 1, 0]].T();
 
-let net = new Net(alpha=0.5, dropout = 0.4);
+let net = new Net(alpha=0.5, dropout = 0.1);
 net.add(new Layer(6));
 net.add(new Layer());
 net.train(X, y, epochs = 10000);
