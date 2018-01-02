@@ -9,6 +9,17 @@ function zeros(n, m) {
     return c;
 }
 
+function ones(n, m) {
+    let c = new Array(n);
+    for (let i = 0; i < n; i++) {
+        c[i] = new Array(m);
+        for (let j = 0; j < m; j++) {
+            c[i][j] = 1;
+        }
+    }
+    return c;
+}
+
 function random(n, m) {
     let c = zeros(n, m);
     for (let i = 0; i < n; i++) {
@@ -223,10 +234,25 @@ function display(s, m) {
     console.log('');
 }
 
+function binomial(p, trials) {
+    let cnt = 0;
+    let sum = 0;
+
+    while(cnt < trials){
+        if (Math.random() < p) {
+            sum += 1;
+        }
+        cnt++;
+    }
+
+    return sum;
+};
+
 class Net {
-    constructor(alpha) {
+    constructor(alpha, dropout = 0.0) {
         this.layers = [];
         this.alpha = alpha;
+        this.dropout = dropout;
     }
 
     add(layer) {
@@ -239,6 +265,10 @@ class Net {
 
     static randomBias(n) {
         return random(n, 1).multiply(2).subtract(1);
+    }
+
+    static binomialMatrix(n, m, p, trials) {
+        return ones(n, m).multiply(binomial(p, trials));
     }
 
     train(X, y, epochs) {
@@ -273,6 +303,8 @@ class Net {
 
 
             this.layers[j].output = this.layers[j].activation_fn(res);
+
+            this.layers[j].output
         }
     }
 
@@ -328,7 +360,7 @@ class Layer {
 const X = [[0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
 const y = [[0, 1, 1, 0]].T();
 
-let net = new Net(alpha=0.5);
+let net = new Net(alpha=0.5, dropout = 0.4);
 net.add(new Layer(6));
 net.add(new Layer());
 net.train(X, y, epochs = 10000);
