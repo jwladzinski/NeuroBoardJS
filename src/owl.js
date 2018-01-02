@@ -19,10 +19,6 @@ function random(n, m) {
     return c;
 }
 
-Array.prototype.size = function () {
-    return [this.length, this[0].length];
-};
-
 Array.prototype.dot = function(b) {
     let a = this;
     let c = zeros(a.length, b[0].length);
@@ -241,6 +237,10 @@ class Net {
         return random(n, m).multiply(2).subtract(1);
     }
 
+    static randomBias(n) {
+        return random(n, 1).multiply(2).subtract(1);
+    }
+
     train(X, y, epochs) {
 
         this.layers[-1] = new Layer(X[0].length, 'sigmoid');
@@ -252,8 +252,8 @@ class Net {
 
             let n = this.layers[j - 1].m;
             let m = j === this.layers.length - 1 ? y[0].length : this.layers[j].m;
-            this.w.push(Net.randomWeights(n, m))
-
+            this.w.push(Net.randomWeights(n, m));
+            this.b.push(Net.randomBias(n, 1));
         }
 
         for (let i = 0; i < epochs; i++) {
@@ -265,7 +265,14 @@ class Net {
 
     activate() {
         for (let j = 0; j < this.layers.length; j++) {
-            this.layers[j].output = this.layers[j].activation_fn(this.layers[j - 1].output.dot(this.w[j]));
+
+            let A = this.layers[j - 1].output;
+
+
+            let res = A.dot(this.w[j]);
+
+
+            this.layers[j].output = this.layers[j].activation_fn(res);
         }
     }
 
@@ -282,7 +289,7 @@ class Net {
 
             let deriv = this.layers[j].activation_deriv(this.layers[j].output);
             let delta = error.multiply(deriv);
-            let dw = alpha.multiply(this.layers[j - 1].output.T().dot(delta));
+            let dw = this.alpha.multiply(this.layers[j - 1].output.T().dot(delta));
             this.w[j] = this.w[j].add(dw);
             prevDelta = delta;
         }
